@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Analisis Kebutuhan Pakan Ternak - Kecamatan Maiwa</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; color: black; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="bg-emerald-800 text-white shadow-lg sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-emerald-700 p-2.5 rounded-xl border border-emerald-600 shadow-inner">
+                    <i data-lucide="sprout" class="w-8 h-8 text-amber-300"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-tight">SiPakan Maiwa</h1>
+                    <p class="text-xs text-emerald-200">Sistem Analisis & Estimasi Kebutuhan Pakan Ternak Kecamatan Maiwa</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="window.print()" class="flex items-center gap-2 bg-emerald-700 hover:bg-emerald-600 px-4 py-2 rounded-lg font-medium text-sm transition-colors border border-emerald-500 shadow-sm">
+                    <i data-lucide="printer" class="w-4 h-4"></i> Cetak Laporan
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sub Header Status Banner -->
+    <div class="bg-emerald-900 text-emerald-100 text-xs py-2 px-4 no-print border-b border-emerald-700">
+        <div class="max-w-7xl mx-auto flex justify-between items-center flex-wrap gap-2">
+            <span><i data-lucide="map-pin" class="w-3.5 h-3.5 inline mr-1 text-amber-400"></i> Wilayah Fokus: Kecamatan Maiwa, Kabupaten Enrekang, Sulawesi Selatan</span>
+            <span class="hidden md:inline"><i data-lucide="info" class="w-3.5 h-3.5 inline mr-1"></i> Standar perhitungan berbasis Standar Nasional (NRC / LIPI)</span>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full space-y-8">
+
+        <!-- Banner Intro / Context -->
+        <section class="bg-gradient-to-r from-emerald-700 to-teal-800 text-white rounded-2xl p-6 md:p-8 shadow-md relative overflow-hidden no-print">
+            <div class="relative z-10 max-w-3xl">
+                <span class="bg-emerald-600/80 text-emerald-100 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block border border-emerald-500/50">Potensi Peternakan Lokal</span>
+                <h2 class="text-2xl md:text-3xl font-bold mb-3">Optimalisasi Pakan Ternak Potong & Ruminansia Maiwa</h2>
+                <p class="text-emerald-100 text-sm md:text-base leading-relaxed">
+                    Kecamatan Maiwa memiliki potensi besar dalam pengembangan peternakan sapi potong dan ternak kecil. Aplikasi ini dirancang khusus untuk mempermudah peternak dan penyuluh di Maiwa memformulasikan pakan ideal berbasis bahan pakan lokal serta mengukur daya dukung lahan HMT secara presisi.
+                </p>
+            </div>
+            <div class="absolute -right-10 -bottom-10 opacity-15 pointer-events-none">
+                <i data-lucide="wheat" class="w-96 h-96"></i>
+            </div>
+        </section>
+
+        <!-- Grid Top: Input Calculator & Live Summary -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Form Input Kalkulator (7 cols) -->
+            <section class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="calculator" class="w-5 h-5 text-emerald-600"></i>
+                        <h3 class="text-lg font-bold text-slate-800">1. Parameter Population & Ternak</h3>
+                    </div>
+                    <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-medium">Langkah 1</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <!-- Jenis Ternak -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">Jenis Ternak</label>
+                        <select id="livestockType" onchange="calculateNutrientRequirements()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 p-3 outline-none transition-all">
+                            <option value="sapi_maiwa" selected>Sapi Potong / Sapi Maiwa</option>
+                            <option value="kambing">Kambing (Peranakan Etawa/Lokal)</option>
+                            <option value="domba">Domba</option>
+                            <option value="ayam_broiler">Ayam Broiler (Unggas)</option>
+                        </select>
+                    </div>
+
+                    <!-- Fase Pemeliharaan -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">Fase Pemeliharaan</label>
+                        <select id="feedPhase" onchange="calculateNutrientRequirements()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 p-3 outline-none transition-all">
+                            <option value="penggemukan" selected>Penggemukan (Fattening)</option>
+                            <option value="pembesaran">Pembesaran / Pertumbuhan</option>
+                            <option value="induk_laktasi">Induk Menyusui / Laktasi</option>
+                            <option value="pemeliharaan_induk">Induk Bunting / Dewasa</option>
+                        </select>
+                    </div>
+
+                    <!-- Jumlah Ekor -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">Populasi Ternak (Ekor)</label>
+                        <div class="relative">
+                            <input type="number" id="headCount" value="10" min="1" oninput="calculateNutrientRequirements()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 p-3 outline-none transition-all pr-12">
+                            <span class="absolute right-3 top-3 text-xs font-semibold text-slate-400">Ekor</span>
+                        </div>
+                    </div>
+
+                    <!-- Bobot Rata-rata -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">Bobot Rata-Rata (Kg / Ekor)</label>
+                        <div class="relative">
+                            <input type="number" id="avgWeight" value="280" min="1" oninput="calculateNutrientRequirements()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 p-3 outline-none transition-all pr-12">
+                            <span class="absolute right-3 top-3 text-xs font-semibold text-slate-400">Kg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Petunjuk & Edukasi Singkat -->
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-amber-900 text-xs flex gap-3">
+                    <i data-lucide="lightbulb" class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5"></i>
+                    <div>
+                        <strong class="font-semibold block mb-1">Catatan Kebutuhan Bahan Kering (BK):</strong>
+                        Kebutuhan BK standar ruminansia berkisar 2.5% - 3.5% dari bobot badan. Sapi Maiwa pada fase penggemukan membutuhkan minimal 3.0% BK dengan imbangan rasio pakan serat dan konsentrat yang seimbang.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Card Summary Kebutuhan Nutrisi Target (5 cols) -->
+            <section class="lg:col-span-5 bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 rounded-2xl shadow-sm flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center border-b border-slate-700 pb-4 mb-4">
+                        <h3 class="text-base font-bold text-emerald-400 flex items-center gap-2">
+                            <i data-lucide="activity" class="w-4 h-4"></i> Target Kebutuhan Pakan (Total)
+                        </h3>
+                        <span class="text-xs bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-500/30">Harian</span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Total BK -->
+                        <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700/60">
+                            <p class="text-xs text-slate-400 mb-1">Kebutuhan Bahan Kering (BK)</p>
+                            <div class="flex justify-between items-baseline">
+                                <span class="text-2xl font-bold text-white" id="reqBK">0</span>
+                                <span class="text-xs font-semibold text-slate-400">Kg BK / Hari</span>
+                            </div>
+                        </div>
+
+                        <!-- Target Hijauan & Konsentrat (Format Segar) -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/60">
+                                <p class="text-xs text-emerald-400 mb-1 font-medium">Hijauan Segar (~20% BK)</p>
+                                <p class="text-xl font-bold text-emerald-300" id="reqHijauan">0</p>
+                                <span class="text-[10px] text-slate-400">Kg Segar / Hari</span>
+                            </div>
+
+                            <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/60">
+                                <p class="text-xs text-amber-400 mb-1 font-medium">Konsentrat (~88% BK)</p>
+                                <p class="text-xl font-bold text-amber-300" id="reqKonsentrat">0</p>
+                                <span class="text-[10px] text-slate-400">Kg Segar / Hari</span>
+                            </div>
+                        </div>
+
+                        <!-- Kebutuhan Nutrisi Spesifik -->
+                        <div class="grid grid-cols-2 gap-3 pt-1">
+                            <div class="text-xs">
+                                <span class="text-slate-400">Target Protein Kasar (PK):</span>
+                                <p class="text-sm font-semibold text-slate-200" id="targetPK">0 Kg (12%)</p>
+                            </div>
+                            <div class="text-xs">
+                                <span class="text-slate-400">Target TDN (Energi):</span>
+                                <p class="text-sm font-semibold text-slate-200" id="targetTDN">0 Kg (65%)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-slate-700/60 text-[11px] text-slate-400 flex items-center justify-between">
+                    <span>Populasi: <strong id="summaryPopulation" class="text-white">10 Ekor</strong></span>
+                    <span>Total Bobot: <strong id="summaryTotalWeight" class="text-white">2,800 Kg</strong></span>
+                </div>
+            </section>
+        </div>
+
+        <!-- Section 2: Formulasi Ransum Pakan Lokal Maiwa -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="layers" class="w-5 h-5 text-emerald-600"></i>
+                        <h3 class="text-lg font-bold text-slate-800">2. Simulator Formulasi Ransum Pakan Lokal Maiwa</h3>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5">Atur proporsi pakan lokal untuk memenuhi target Bahan Kering (BK), Protein Kasar (PK), dan TDN ternak.</p>
+                </div>
+                <button onclick="resetRation()" class="self-start md:self-auto text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Proporsi
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Tabel Pakan Lokal Slider (7 cols) -->
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-[11px] font-semibold uppercase text-slate-400 bg-slate-50 border-y border-slate-200">
+                                    <th class="py-3 px-3">Bahan Pakan Lokal</th>
+                                    <th class="py-3 px-2 text-center">BK (%)</th>
+                                    <th class="py-3 px-2 text-center">PK (%)</th>
+                                    <th class="py-3 px-2 text-center">TDN (%)</th>
+                                    <th class="py-3 px-3 text-center w-36">Proporsi (% BK)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="feedTableBody" class="divide-y divide-slate-100 text-sm">
+                                <!-- Dynamic Render via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Total Proporsi Warning -->
+                    <div id="proportionAlert" class="hidden p-3 rounded-xl text-xs font-medium flex items-center gap-2">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <!-- Grafik Proporsi & Evaluasi Nutrisi (5 cols) -->
+                <div class="lg:col-span-5 bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col justify-between space-y-4">
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-3 text-center">Komposisi Formulasi Ransum</h4>
+                        <div class="h-48 relative flex items-center justify-center">
+                            <canvas id="feedPieChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Progress Evaluasi Nutrisi -->
+                    <div class="space-y-3 pt-3 border-t border-slate-200">
+                        <h4 class="text-xs font-bold text-slate-700 uppercase">Evaluasi Kecukupan Nutrisi</h4>
+                        
+                        <!-- Protein Kasar Status -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-600">Protein Kasar (PK) Tercapai:</span>
+                                <span id="pkStatusText" class="font-bold text-slate-800">0% / Target 12%</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                                <div id="pkProgressBar" class="bg-emerald-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- TDN Status -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-600">Energi (TDN) Tercapai:</span>
+                                <span id="tdnStatusText" class="font-bold text-slate-800">0% / Target 65%</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                                <div id="tdnProgressBar" class="bg-emerald-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Estimator Ketersediaan Hijauan Lahan di Maiwa -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="sun-medium" class="w-5 h-5 text-emerald-600"></i>
+                    <h3 class="text-lg font-bold text-slate-800">3. Estimator Daya Dukung Lahan HMT Wilayah Maiwa</h3>
+                </div>
+                <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-medium">Musim & Lahan</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Input Parameter Lahan (5 cols) -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">Luas Lahan Hijauan Makanan Ternak (HMT)</label>
+                        <div class="relative">
+                            <input type="number" id="landArea" value="1.5" step="0.1" min="0.1" oninput="calculateLandCapacity()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 p-3 outline-none transition-all pr-16">
+                            <span class="absolute right-3 top-3 text-xs font-semibold text-slate-400">Hektar (Ha)</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-1">Rata-rata produktivitas HMT di Maiwa: ~50-80 ton segar/Ha/tahun (Rumput Gajah/Odot).</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">Kondisi Musim Dominan</label>
+                        <select id="seasonSelect" onchange="calculateLandCapacity()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 p-3 outline-none transition-all">
+                            <option value="hujan" selected>Musim Hujan (Produktivitas 100%)</option>
+                            <option value="kemarau">Musim Kemarau (Produktivitas Drop ~40%)</option>
+                        </select>
+                    </div>
+
+                    <!-- Box Highlight Status Balance -->
+                    <div id="balanceCard" class="p-4 rounded-xl border flex items-start gap-3 bg-emerald-50 border-emerald-200 text-emerald-900">
+                        <i data-lucide="check-circle-2" id="balanceIcon" class="w-6 h-6 text-emerald-600 flex-shrink-0 mt-0.5"></i>
+                        <div>
+                            <h5 id="balanceTitle" class="font-bold text-sm">Status Daya Dukung: SURPLUS</h5>
+                            <p id="balanceDesc" class="text-xs mt-0.5">Lahan HMT Anda sanggup memenuhi kebutuhan hijauan segar populasi ternak saat ini.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Suplai vs Demand Bulanan (7 cols) -->
+                <div class="lg:col-span-7 bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                    <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-3">Proyeksi Suplai vs Kebutuhan Pakan Hijauan Bulanan (Kg/Bulan)</h4>
+                    <div class="h-64">
+                        <canvas id="supplyDemandChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Printable Summary Report (Akan Tampil Bagus Saat Di-Cetak/Print) -->
+        <section id="printableReport" class="bg-white p-6 rounded-2xl border border-slate-200 space-y-4">
+            <div class="border-b border-slate-200 pb-3 flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Ringkasan Analisis Kebutuhan Pakan Maiwa</h3>
+                    <p class="text-xs text-slate-500">Dokumen Hasil Perhitungan Otomatis Sistem SiPakan Maiwa</p>
+                </div>
+                <div class="text-right text-xs text-slate-400">
+                    <p id="reportDate"></p>
+                    <p>Lokasi: Kec. Maiwa, Kab. Enrekang</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                <div class="p-3 bg-slate-50 rounded-lg">
+                    <span class="text-slate-500 block">Komoditas Ternak</span>
+                    <strong id="repLivestock" class="text-slate-800 text-sm">Sapi Maiwa</strong>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-lg">
+                    <span class="text-slate-500 block">Populasi & Rata-rata Bobot</span>
+                    <strong id="repPopWeight" class="text-slate-800 text-sm">10 Ekor @ 280 kg</strong>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-lg">
+                    <span class="text-slate-500 block">Kebutuhan Hijauan Segar</span>
+                    <strong id="repHijauan" class="text-slate-800 text-sm">0 Kg / Hari</strong>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-lg">
+                    <span class="text-slate-500 block">Kebutuhan Konsentrat</span>
+                    <strong id="repKonsentrat" class="text-slate-800 text-sm">0 Kg / Hari</strong>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 no-print mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+            <p>&copy; 2026 Sistem Analisis Kebutuhan Pakan Ternak Kecamatan Maiwa, Kabupaten Enrekang.</p>
+            <p class="text-slate-500">Dikembangkan untuk optimalisasi manajemen pakan berbasis potensi hijauan lokal & peningkatan produktivitas ternak Maiwa.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Data Spesifikasi Pakan Lokal Khas Maiwa
+        const localFeeds = [
+            { id: 'odot', name: 'Rumput Odot (Hijauan)', bk: 18, pk: 12.0, tdn: 58, defaultProp: 40, type: 'hijauan' },
+            { id: 'gajah', name: 'Rumput Gajah / Raja', bk: 20, pk: 9.5, tdn: 55, defaultProp: 30, type: 'hijauan' },
+            { id: 'lamtoro', name: 'Legum / Lamtoro / Gamal', bk: 24, pk: 22.0, tdn: 65, defaultProp: 15, type: 'legum' },
+            { id: 'jerami', name: 'Jerami Padi (Olahan/Segar)', bk: 85, pk: 4.5, tdn: 45, defaultProp: 5, type: 'limbah' },
+            { id: 'dedak', name: 'Dedak Padi Halus', bk: 88, pk: 11.5, tdn: 68, defaultProp: 7, type: 'konsentrat' },
+            { id: 'kelapa', name: 'Bungkil Kelapa / Olahan', bk: 90, pk: 19.0, tdn: 76, defaultProp: 3, type: 'konsentrat' }
+        ];
+
+        // State Aplikasi
+        let currentFeeds = JSON.parse(JSON.stringify(localFeeds));
+        let pieChartInstance = null;
+        let supplyDemandChartInstance = null;
+
+        // Inisialisasi Aplikasi Saat Window Load
+        window.onload = function() {
+            lucide.createIcons();
+            document.getElementById('reportDate').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            renderFeedTable();
+            initCharts();
+            calculateNutrientRequirements();
+        };
+
+        // Render Tabel Formulasi Ransum Pakan
+        function renderFeedTable() {
+            const tbody = document.getElementById('feedTableBody');
+            tbody.innerHTML = '';
+
+            currentFeeds.forEach((feed, index) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/80 transition-colors';
+                tr.innerHTML = `
+                    <td class="py-3 px-3 font-medium text-slate-800">
+                        ${feed.name}
+                        <span class="block text-[10px] text-slate-400 capitalize">${feed.type}</span>
+                    </td>
+                    <td class="py-3 px-2 text-center text-slate-600">${feed.bk}%</td>
+                    <td class="py-3 px-2 text-center text-slate-600">${feed.pk}%</td>
+                    <td class="py-3 px-2 text-center text-slate-600">${feed.tdn}%</td>
+                    <td class="py-3 px-3 text-center">
+                        <div class="flex items-center gap-2">
+                            <input type="range" min="0" max="100" value="${feed.defaultProp}" 
+                                oninput="updateFeedProp(${index}, this.value)" 
+                                class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+                            <span class="text-xs font-semibold text-slate-700 w-8 text-right">${feed.defaultProp}%</span>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Update Proporsi Pakan dari Slider
+        function updateFeedProp(index, value) {
+            currentFeeds[index].defaultProp = parseFloat(value) || 0;
+            renderFeedTable();
+            calculateRationNutrition();
+            updatePieChart();
+        }
+
+        // Reset Proporsi Pakan
+        function resetRation() {
+            currentFeeds = JSON.parse(JSON.stringify(localFeeds));
+            renderFeedTable();
+            calculateRationNutrition();
+            updatePieChart();
+        }
+
+        // Kalkulasi Utama Kebutuhan Ternak
+        function calculateNutrientRequirements() {
+            const type = document.getElementById('livestockType').value;
+            const phase = document.getElementById('feedPhase').value;
+            const headCount = parseFloat(document.getElementById('headCount').value) || 0;
+            const avgWeight = parseFloat(document.getElementById('avgWeight').value) || 0;
+
+            const totalLiveWeight = headCount * avgWeight;
+
+            // Rasio Kebutuhan BK % dari Bobot Badan
+            let bkPercent = 0.03; // Default 3%
+            if (type === 'sapi_maiwa') {
+                bkPercent = phase === 'penggemukan' ? 0.032 : (phase === 'induk_laktasi' ? 0.035 : 0.028);
+            } else if (type === 'kambing' || type === 'domba') {
+                bkPercent = phase === 'induk_laktasi' ? 0.04 : 0.035;
+            } else if (type === 'ayam_broiler') {
+                bkPercent = 0.08; // Pakan jadi konsentrat
+            }
+
+            // Total BK per hari (Kg)
+            const totalBK = totalLiveWeight * bkPercent;
+
+            // Estimasi Hijauan vs Konsentrat (60:40 standard ruminansia)
+            const hijauanBK = totalBK * 0.70; // 70% dari BK hijauan
+            const konsentratBK = totalBK * 0.30; // 30% dari BK konsentrat
+
+            // Segar = BK / (% Air sisa). Hijauan rata2 BK 20%, Konsentrat BK 88%
+            const hijauanSegar = hijauanBK / 0.20;
+            const konsentratSegar = konsentratBK / 0.88;
+
+            // Target PK & TDN
+            const targetPKKg = totalBK * 0.12; // Standard 12% PK
+            const targetTDNKg = totalBK * 0.65; // Standard 65% TDN
+
+            // Update UI Header & Summary
+            document.getElementById('reqBK').innerText = totalBK.toLocaleString('id-ID', { maximumFractionDigits: 1 });
+            document.getElementById('reqHijauan').innerText = hijauanSegar.toLocaleString('id-ID', { maximumFractionDigits: 1 });
+            document.getElementById('reqKonsentrat').innerText = konsentratSegar.toLocaleString('id-ID', { maximumFractionDigits: 1 });
+            
+            document.getElementById('targetPK').innerText = `${targetPKKg.toFixed(1)} Kg (12%)`;
+            document.getElementById('targetTDN').innerText = `${targetTDNKg.toFixed(1)} Kg (65%)`;
+
+            document.getElementById('summaryPopulation').innerText = `${headCount} Ekor`;
+            document.getElementById('summaryTotalWeight').innerText = `${totalLiveWeight.toLocaleString('id-ID')} Kg`;
+
+            // Update Report Section
+            const typeText = document.getElementById('livestockType').options[document.getElementById('livestockType').selectedIndex].text;
+            document.getElementById('repLivestock').innerText = typeText;
+            document.getElementById('repPopWeight').innerText = `${headCount} Ekor @ ${avgWeight} kg`;
+            document.getElementById('repHijauan').innerText = `${hijauanSegar.toFixed(1)} Kg / Hari`;
+            document.getElementById('repKonsentrat').innerText = `${konsentratSegar.toFixed(1)} Kg / Hari`;
+
+            // Re-calculate Ration & Land Capacity
+            calculateRationNutrition();
+            calculateLandCapacity();
+        }
+
+        // Kalkulasi Ransum Pakan berdasarkan Formulasi Pilihan
+        function calculateRationNutrition() {
+            const totalProp = currentFeeds.reduce((sum, f) => sum + f.defaultProp, 0);
+            const alertBox = document.getElementById('proportionAlert');
+
+            if (totalProp !== 100) {
+                alertBox.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800');
+                alertBox.classList.add('bg-amber-100', 'text-amber-800');
+                alertBox.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600"></i> Total proporsi pakan saat ini: <strong>${totalProp}%</strong> (Idealnya total = 100%)`;
+            } else {
+                alertBox.classList.remove('hidden', 'bg-amber-100', 'text-amber-800');
+                alertBox.classList.add('bg-emerald-100', 'text-emerald-800');
+                alertBox.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i> Total proporsi ransum sempurna 100%.`;
+            }
+            lucide.createIcons();
+
+            // Hitung Rata-rata PK & TDN Ransum
+            let calculatedPK = 0;
+            let calculatedTDN = 0;
+
+            currentFeeds.forEach(f => {
+                const weightFraction = f.defaultProp / 100;
+                calculatedPK += f.pk * weightFraction;
+                calculatedTDN += f.tdn * weightFraction;
+            });
+
+            // Target Standard: PK ~12%, TDN ~65%
+            const pkRatio = Math.min(Math.round((calculatedPK / 12) * 100), 100);
+            const tdnRatio = Math.min(Math.round((calculatedTDN / 65) * 100), 100);
+
+            document.getElementById('pkStatusText').innerText = `${calculatedPK.toFixed(1)}% / Target 12.0%`;
+            document.getElementById('pkProgressBar').style.width = `${pkRatio}%`;
+            
+            document.getElementById('tdnStatusText').innerText = `${calculatedTDN.toFixed(1)}% / Target 65.0%`;
+            document.getElementById('tdnProgressBar').style.width = `${tdnRatio}%`;
+        }
+
+        // Kalkulasi Daya Dukung Lahan HMT Maiwa
+        function calculateLandCapacity() {
+            const landArea = parseFloat(document.getElementById('landArea').value) || 0;
+            const season = document.getElementById('seasonSelect').value;
+            
+            // Re-fetch daily hijauan requirement
+            const headCount = parseFloat(document.getElementById('headCount').value) || 0;
+            const avgWeight = parseFloat(document.getElementById('avgWeight').value) || 0;
+            const totalBK = (headCount * avgWeight) * 0.03;
+            const dailyHijauanNeededSegar = (totalBK * 0.70) / 0.20; // Kg per hari
+            const monthlyDemand = dailyHijauanNeededSegar * 30; // Kg per bulan
+
+            // Yield HMT Maiwa (kg segar per Ha per bulan)
+            // Musim hujan ~6,000 kg/Ha/bulan. Musim kemarau ~3,600 kg/Ha/bulan
+            const baseYieldPerHa = season === 'hujan' ? 6000 : 3600;
+            const monthlySupply = landArea * baseYieldPerHa;
+
+            // Balance Indicator
+            const balanceCard = document.getElementById('balanceCard');
+            const balanceTitle = document.getElementById('balanceTitle');
+            const balanceDesc = document.getElementById('balanceDesc');
+            const balanceIcon = document.getElementById('balanceIcon');
+
+            if (monthlySupply >= monthlyDemand) {
+                const surplus = Math.round(monthlySupply - monthlyDemand);
+                balanceCard.className = "p-4 rounded-xl border flex items-start gap-3 bg-emerald-50 border-emerald-200 text-emerald-900";
+                balanceTitle.innerText = `Status Daya Dukung: SURPLUS (+${surplus.toLocaleString('id-ID')} Kg/Bln)`;
+                balanceDesc.innerText = `Lahan ${landArea} Ha HMT di Maiwa sangat mencukupi kebutuhan populasi ${headCount} ekor ternak.`;
+                balanceIcon.setAttribute('data-lucide', 'check-circle-2');
+                balanceIcon.className = 'w-6 h-6 text-emerald-600 flex-shrink-0 mt-0.5';
+            } else {
+                const deficit = Math.round(monthlyDemand - monthlySupply);
+                balanceCard.className = "p-4 rounded-xl border flex items-start gap-3 bg-rose-50 border-rose-200 text-rose-900";
+                balanceTitle.innerText = `Status Daya Dukung: DEFISIT (-${deficit.toLocaleString('id-ID')} Kg/Bln)`;
+                balanceDesc.innerText = `Produksi lahan HMT kurang. Disarankan menambah lahan pakan atau memanfaatkan limbah pertanian jerami padi.`;
+                balanceIcon.setAttribute('data-lucide', 'alert-octagon');
+                balanceIcon.className = 'w-6 h-6 text-rose-600 flex-shrink-0 mt-0.5';
+            }
+            lucide.createIcons();
+
+            updateSupplyDemandChart(monthlySupply, monthlyDemand);
+        }
+
+        // Inisialisasi Chart.js
+        function initCharts() {
+            // 1. Pie Chart Komposisi Pakan
+            const ctxPie = document.getElementById('feedPieChart').getContext('2d');
+            pieChartInstance = new Chart(ctxPie, {
+                type: 'doughnut',
+                data: {
+                    labels: currentFeeds.map(f => f.name),
+                    datasets: [{
+                        data: currentFeeds.map(f => f.defaultProp),
+                        backgroundColor: [
+                            '#059669', '#10b981', '#34d399', 
+                            '#f59e0b', '#3b82f6', '#8b5cf6'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 12, font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            // 2. Bar Chart Suplai vs Demand
+            const ctxBar = document.getElementById('supplyDemandChart').getContext('2d');
+            supplyDemandChartInstance = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['Estimasi Suplai Lahan HMT', 'Kebutuhan Pakan Populasi'],
+                    datasets: [{
+                        label: 'Jumlah Hijauan (Kg / Bulan)',
+                        data: [0, 0],
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Update Pie Chart Data
+        function updatePieChart() {
+            if (!pieChartInstance) return;
+            pieChartInstance.data.labels = currentFeeds.map(f => f.name);
+            pieChartInstance.data.datasets[0].data = currentFeeds.map(f => f.defaultProp);
+            pieChartInstance.update();
+        }
+
+        // Update Bar Chart Data
+        function updateSupplyDemandChart(supply, demand) {
+            if (!supplyDemandChartInstance) return;
+            supplyDemandChartInstance.data.datasets[0].data = [supply, demand];
+            supplyDemandChartInstance.update();
+        }
+    </script>
+</body>
+</html>
